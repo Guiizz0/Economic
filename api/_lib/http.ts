@@ -15,7 +15,21 @@ export function sendJson(res: ServerResponse, status: number, body: unknown, cac
   res.end(JSON.stringify(body))
 }
 
-const UA = 'Mozilla/5.0 (compatible; EconomicApp/1.0; +https://vercel.com)'
+/** Envolve o handler: qualquer exceção vira JSON com a causa (e fica no log da Vercel). */
+export function safe(fn: (req: IncomingMessage, res: ServerResponse) => Promise<void>) {
+  return async (req: IncomingMessage, res: ServerResponse) => {
+    try {
+      await fn(req, res)
+    } catch (e) {
+      console.error('[api]', req.url, e)
+      if (!res.headersSent) {
+        sendJson(res, 500, { error: 'Erro interno', detail: String((e as Error)?.message ?? e) })
+      }
+    }
+  }
+}
+
+export const UA = 'Mozilla/5.0 (compatible; EconomicApp/1.0; +https://vercel.com)'
 
 export async function fetchJson(url: string, timeoutMs = 8000): Promise<any> {
   const ctrl = new AbortController()

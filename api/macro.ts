@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import type { MacroResponse, MacroSeries } from '../shared/types'
-import { fetchJson, sendJson } from './_lib/http'
+import { fetchJson, safe, sendJson } from './_lib/http'
 
 /**
  * GET /api/macro — indicadores do Banco Central (API aberta do SGS, sem chave).
@@ -39,10 +39,12 @@ async function load(id: number, n: number): Promise<MacroSeries> {
   }
 }
 
-export default async function handler(_req: IncomingMessage, res: ServerResponse) {
+async function handler(_req: IncomingMessage, res: ServerResponse) {
   const [selic, cdi, ipca, ipca12, usd] = await Promise.all(
     Object.values(SERIES).map((s) => load(s.id, s.n)),
   )
   const body: MacroResponse = { updatedAt: Date.now(), selic, cdi, ipca, ipca12, usd }
   sendJson(res, 200, body, 's-maxage=1800, stale-while-revalidate=7200')
 }
+
+export default safe(handler)

@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'http'
-import { searchParams, sendJson } from './_lib/http'
+import { safe, searchParams, sendJson } from './_lib/http'
 import { RANGES, SYMBOL_RE, getHistory } from './_lib/providers'
 
 /** GET /api/history?symbol=PETR4.SA&range=6M   (range: 1D 5D 1M 6M 1Y 5Y MAX) */
-export default async function handler(req: IncomingMessage, res: ServerResponse) {
+async function handler(req: IncomingMessage, res: ServerResponse) {
   const p = searchParams(req)
   const symbol = (p.get('symbol') ?? '').trim()
   const range = (p.get('range') ?? '6M').toUpperCase()
@@ -19,3 +19,5 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     sendJson(res, 502, { error: 'Não foi possível obter os dados agora.' })
   }
 }
+
+export default safe(handler)

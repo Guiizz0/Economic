@@ -1,10 +1,10 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import type { Quote, QuotesResponse } from '../shared/types'
-import { mapLimit, searchParams, sendJson } from './_lib/http'
+import { mapLimit, safe, searchParams, sendJson } from './_lib/http'
 import { SYMBOL_RE, getQuote } from './_lib/providers'
 
 /** GET /api/quotes?symbols=PETR4.SA,AAPL,BTC-USD  (máx. 40 símbolos) */
-export default async function handler(req: IncomingMessage, res: ServerResponse) {
+async function handler(req: IncomingMessage, res: ServerResponse) {
   const symbols = [
     ...new Set(
       (searchParams(req).get('symbols') ?? '')
@@ -27,3 +27,5 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   // 30s no cache de borda; depois serve o antigo enquanto atualiza em segundo plano.
   sendJson(res, 200, body, 's-maxage=30, stale-while-revalidate=120')
 }
+
+export default safe(handler)
