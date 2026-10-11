@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tema escuro (padrão). Cores em canais RGB para permitir transparência no Tailwind. */
+:root {
+  color-scheme: dark;
+  --bg: 9 13 24;
+  --panel: 16 22 38;
+  --panel2: 24 32 54;
+  --line: 36 47 74;
+  --text: 229 234 245;
+  --muted: 133 146 171;
+  --brand: 124 92 255;
+  --brand2: 34 211 238;
+  --up: 38 222 160;
+  --down: 255 90 120;
+}
+
+:root.light {
+  color-scheme: light;
+  --bg: 243 245 251;
+  --panel: 255 255 255;
+  --panel2: 238 242 250;
+  --line: 222 228 241;
+  --text: 17 24 39;
+  --muted: 96 108 133;
+  --brand: 99 68 240;
+  --brand2: 8 145 178;
+  --up: 5 150 105;
+  --down: 225 29 72;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  @apply bg-bg text-text antialiased;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-line bg-panel;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-line bg-panel2 px-2.5 py-1 text-xs font-medium text-muted;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand;
+  }
+  .btn-primary {
+    @apply btn bg-gradient-to-r from-brand to-brand2 text-white hover:opacity-90;
+  }
+  .btn-ghost {
+    @apply btn border border-line bg-panel2 text-text hover:border-brand/60;
+  }
+  .input {
+    @apply w-full rounded-xl border border-line bg-panel2 px-3 py-2 text-sm text-text placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-medium uppercase tracking-wide text-muted;
+  }
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.ticker-track {
+  animation: ticker 70s linear infinite;
+}
+.ticker-wrap:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.75);
+  }
+}
+.live-dot {
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.skeleton {
+  @apply rounded-md;
+  background: linear-gradient(90deg, rgb(var(--panel2)) 25%, rgb(var(--line)) 50%, rgb(var(--panel2)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track,
+  .live-dot,
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* range slider */
+input[type='range'] {
+  accent-color: rgb(var(--brand));
+}
